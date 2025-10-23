@@ -61,4 +61,16 @@ class Vec2Utils {
     public static function clone(v: Vec2): Vec2 {
         return { x: v.x, y: v.y };
     }
+    
+    /**
+     * Calculate squared distance between two points (avoids expensive sqrt)
+     * @param a First point
+     * @param b Second point
+     * @return Squared distance in game units
+     */
+    public static function distanceSquared(a: Vec2, b: Vec2): Int {
+        final dx = a.x - b.x;
+        final dy = a.y - b.y;
+        return dx * dx + dy * dy;
+    }
 }

@@ -198,13 +198,14 @@ class EngineEntitySpecs {
         final colliders = [];
         final spacing = 10 * NecrotonEngine.Config.unitPixels; // 10 units between each collider
         
-        for (row in 0...rows) {
-            for (col in 0...cols) {
+        for (row in 1...rows + 1) {
+            for (col in 1...cols + 1) {
                 final x = col * spacing;
                 final y = row * spacing;
                 
                 // Chess pattern: alternate passable/impassable
-                final passable = (row + col) % 2 == 0;
+                // final passable = (row + col) % 2 == 0;
+                final passable = false;
                 final isTrigger = false; // No triggers in basic map
                 
                 colliders.push(getColliderSpec(x, y, passable, isTrigger));
@@ -217,7 +218,7 @@ class EngineEntitySpecs {
     /**
      * Get entity spec by type and index
      */
-    public static function getEntitySpec(type: EntityType, index: Int = 0): EngineEntitySpec {
+    public static function getDefaultEntitySpec(type: EntityType, index: Int = 0): EngineEntitySpec {
         switch (type) {
             case CHARACTER:
                 switch (index) {

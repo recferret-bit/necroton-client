@@ -1,5 +1,6 @@
 package engine.model.entities.impl;
 
+import engine.geometry.Vec2Utils;
 import engine.geometry.Vec2;
 import engine.NecrotonEngine;
 import engine.model.entities.base.BaseEngineEntity;
@@ -95,7 +96,8 @@ class EngineCharacterEntity extends BaseEngineEntity {
      * @param dt Delta time
      */
     public function applyMovementStep(movementX: Float, movementY: Float, dt: Float): Void {
-        final movementStep = calculateMovementStep(movementX, movementY, dt);
+        final movementStep = Vec2Utils.add(calculateMovementStep(movementX, movementY, dt), movementCorrection);
+
         // Apply movement step to position
         pos.x += movementStep.x;
         pos.y += movementStep.y;
@@ -103,6 +105,8 @@ class EngineCharacterEntity extends BaseEngineEntity {
         // Clear velocity (movement is step-based, not continuous)
         vel.x = 0;
         vel.y = 0;
+
+        clearMovementCorrection();
     }
 
     /**

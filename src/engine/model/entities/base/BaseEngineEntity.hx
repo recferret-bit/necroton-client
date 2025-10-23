@@ -1,5 +1,6 @@
 package engine.model.entities.base;
 
+import engine.geometry.Vec2;
 import engine.geometry.Vec2Utils;
 import engine.model.EntityType;
 import engine.model.entities.base.AbstractEngineEntity;
@@ -10,10 +11,17 @@ import engine.model.entities.base.EngineEntitySpec;
  */
 abstract class BaseEngineEntity extends AbstractEngineEntity {
     
+    /** Movement correction */
+    var movementCorrection: Vec2 = Vec2Utils.create(0, 0);
+
     public function new() {
         reset(null);
     }
     
+    /**
+     * Abstarct interface implementation
+     */
+
     public function serialize(): Dynamic {
         return {
             id: id,
@@ -67,5 +75,19 @@ abstract class BaseEngineEntity extends AbstractEngineEntity {
         isInputDriven = spec.isInputDriven != null ? spec.isInputDriven : false;
         colliderWidth = spec.colliderWidth != null ? spec.colliderWidth : 1;
         colliderHeight = spec.colliderHeight != null ? spec.colliderHeight : 1;
+    }
+
+    /**
+     * Apply movement correction
+     */
+    public function applyMovementCorrection(correction: Vec2): Void {
+        movementCorrection = correction;
+    }
+
+    /**
+     * Reset movement correction
+     */
+    public function clearMovementCorrection(): Void {
+        movementCorrection = Vec2Utils.create(0, 0);
     }
 }

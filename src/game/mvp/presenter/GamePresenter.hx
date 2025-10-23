@@ -349,7 +349,7 @@ class GamePresenter {
      */
     private function spawnMapColliders(): Void {
         // Generate 10x10 grid of colliders with 10 unit spacing
-        final colliderSpecs = EngineEntitySpecs.generateMapColliders(10, 10);
+        final colliderSpecs = EngineEntitySpecs.generateMapColliders(1, 1);
         
         for (spec in colliderSpecs) {
             engine.spawnEntity(spec);

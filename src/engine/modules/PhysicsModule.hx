@@ -1,10 +1,13 @@
 package engine.modules;
 
+import engine.geometry.Rect;
 import engine.geometry.RectUtils;
 import engine.geometry.Vec2Utils;
 import engine.model.EntityType;
 import engine.model.GameModelState;
 import engine.model.entities.base.BaseEngineEntity;
+import engine.model.entities.impl.EngineColliderEntity;
+import engine.NecrotonEngine;
 
 /**
  * Physics module for movement and collision
@@ -64,19 +67,36 @@ class PhysicsModule implements IModule {
             });
         }
         
-        // Debug: Check if we have entities
-        if (entities.length > 0) {
-            trace('COLLISION STEP: Found ' + Std.string(entities.length) + ' alive entities');
-        }
+        // Simple AABB collision detection with broad-phase distance filtering
+        final unitPixels = NecrotonEngine.Config.unitPixels;
         
-        // Simple AABB collision detection
         for (i in 0...entities.length) {
             for (j in i + 1...entities.length) {
                 final a = entities[i];
                 final b = entities[j];
+
+                // Broad-phase: Use actual collider dimensions for more precise collision detection
+                final widthA = a.colliderWidth * unitPixels;
+                final heightA = a.colliderHeight * unitPixels;
+                final widthB = b.colliderWidth * unitPixels;
+                final heightB = b.colliderHeight * unitPixels;
                 
-                if (checkCollision(a, b)) {
-                    resolveCollision(a, b);
+                // Calculate maximum possible distance between collider centers
+                final maxDistanceX = (widthA + widthB) / 2;
+                final maxDistanceY = (heightA + heightB) / 2;
+                final maxDistanceSquared = maxDistanceX * maxDistanceX + maxDistanceY * maxDistanceY;
+                
+                // Calculate actual distance between entity centers
+                final distanceSquared = Vec2Utils.distanceSquared(a.pos, b.pos);
+                
+                // Skip collision check if entities are too far apart
+                if (distanceSquared > maxDistanceSquared) {
+                    continue;
+                }
+
+                final collisionResult = checkCollision(a, b);
+                if (collisionResult.intersects) {
+                    resolveCollision(collisionResult.rectA, a, collisionResult.rectB, b);
                 }
             }
         }
@@ -89,7 +109,7 @@ class PhysicsModule implements IModule {
     public function registerCollider(entity: Dynamic): Void {
         // Simplified - in practice would add to spatial hash
     }
-    
+
     /**
      * Unregister collider for entity
      * @param entityId Entity ID
@@ -97,76 +117,49 @@ class PhysicsModule implements IModule {
     public function unregisterCollider(entityId: Int): Void {
         // Simplified - in practice would remove from spatial hash
     }
-    
-    private function checkCollision(a: BaseEngineEntity, b: BaseEngineEntity): Bool {
+
+    private function checkCollision(a: BaseEngineEntity, b: BaseEngineEntity): { intersects: Bool, rectA: Rect, rectB: Rect } {
         // Create rectangles for collision detection
-        final colliderWidth = Std.int(a.colliderWidth * 32);
-        final colliderHeight = Std.int(a.colliderHeight * 32);
-        final rectA = RectUtils.create(a.pos.x, a.pos.y, colliderWidth, colliderHeight);
-        final rectB = RectUtils.create(b.pos.x, b.pos.y, colliderWidth, colliderHeight);
+        final unitPixels = NecrotonEngine.Config.unitPixels;
+        final colliderAWidth = Std.int(a.colliderWidth * unitPixels);
+        final colliderAHeight = Std.int(a.colliderHeight * unitPixels);
+        final colliderBWidth = Std.int(b.colliderWidth * unitPixels);
+        final colliderBHeight = Std.int(b.colliderHeight * unitPixels);
+        final rectA = RectUtils.create(a.pos.x, a.pos.y, colliderAWidth, colliderAHeight);
+        final rectB = RectUtils.create(b.pos.x, b.pos.y, colliderBWidth, colliderBHeight);
         
         final intersects = RectUtils.intersectsRect(rectA, rectB);
         
-        // Debug collision detection
-        if (intersects) {
-            trace('COLLISION DETECTED:');
-            trace('  Entity A: type=' + Std.string(a.type) + ', pos=(' + Std.string(a.pos.x) + ', ' + Std.string(a.pos.y) + '), size=' + Std.string(a.colliderWidth) + 'x' + Std.string(a.colliderHeight));
-            trace('  Entity B: type=' + Std.string(b.type) + ', pos=(' + Std.string(b.pos.x) + ', ' + Std.string(b.pos.y) + '), size=' + Std.string(b.colliderWidth) + 'x' + Std.string(b.colliderHeight));
-            trace('  Rect A: x=' + Std.string(rectA.x) + ', y=' + Std.string(rectA.y) + ', w=' + Std.string(rectA.width) + ', h=' + Std.string(rectA.height));
-            trace('  Rect B: x=' + Std.string(rectB.x) + ', y=' + Std.string(rectB.y) + ', w=' + Std.string(rectB.width) + ', h=' + Std.string(rectB.height));
-        }
-        
-        return intersects;
+        return {
+            intersects: intersects,
+            rectA: rectA,
+            rectB: rectB
+        };
     }
     
-    private function resolveCollision(a: Dynamic, b: Dynamic): Void {
-        trace('RESOLVING COLLISION between ' + Std.string(a.type) + ' and ' + Std.string(b.type));
-        
-        // Create rectangles for collision resolution
-        final rectA = RectUtils.create(a.pos.x, a.pos.y, a.colliderWidth, a.colliderHeight);
-        final rectB = RectUtils.create(b.pos.x, b.pos.y, b.colliderWidth, b.colliderHeight);
-        
+    private function resolveCollision(rectA: Rect, entityA: BaseEngineEntity, rectB: Rect, entityB: BaseEngineEntity): Void {
         // Get penetration depth for proper AABB separation
         final separation = RectUtils.getIntersectionDepth(rectA, rectB);
-        trace('  Separation vector: (' + Std.string(separation.x) + ', ' + Std.string(separation.y) + ')');
         
         // Check if either entity is a collider
-        final aIsCollider = a.type == EntityType.COLLIDER;
-        final bIsCollider = b.type == EntityType.COLLIDER;
-        trace('  aIsCollider: ' + Std.string(aIsCollider) + ', bIsCollider: ' + Std.string(bIsCollider));
+        final aIsCollider = entityA.type == EntityType.COLLIDER;
+        final bIsCollider = entityB.type == EntityType.COLLIDER;
         
+        // If either entity is a collider, we need to prevent them from moving into each other
         if (aIsCollider || bIsCollider) {
-            final collider = aIsCollider ? a : b;
-            final entity = aIsCollider ? b : a;
+            final collider = cast(aIsCollider ? entityA : entityB, EngineColliderEntity);
+            final entity = aIsCollider ? entityB : entityA;
             
-            // Check if collider has passable property and if it's non-passable
-            final isPassable = Reflect.hasField(collider, "passable") && Reflect.field(collider, "passable") == true;
-            
-            if (!isPassable) {
+            // If collider is not passable, we need to prevent the entity from moving into it
+            if (!collider.passable) {
                 // Push entity completely out of collider
-                if (aIsCollider) {
-                    // a is collider, push b away
-                    entity.pos = Vec2Utils.sub(entity.pos, separation);
-                } else {
-                    // b is collider, push a away
-                    entity.pos = Vec2Utils.add(entity.pos, separation);
-                }
-                
-                // Zero velocity to stop movement
-                entity.vel.x = 0;
-                entity.vel.y = 0;
+                entity.applyMovementCorrection(separation);
             }
             
-            // Handle trigger
-            final isTrigger = Reflect.hasField(collider, "isTrigger") && Reflect.field(collider, "isTrigger") == true;
-            if (isTrigger) {
+            // Handle collider trigger
+            if (collider.isTrigger) {
                 trace("Collider trigger activated: " + collider.id + " by entity: " + entity.id);
             }
-        } else {
-            // Regular entity-to-entity collision
-            // Apply separation to both entities
-            a.pos = Vec2Utils.add(a.pos, Vec2Utils.scale(separation, 0.5));
-            b.pos = Vec2Utils.sub(b.pos, Vec2Utils.scale(separation, 0.5));
         }
     }
 }
