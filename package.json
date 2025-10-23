@@ -1,0 +1,29 @@
+{
+  "name": "haxe-heaps-mobile-game",
+  "version": "1.0.0",
+  "description": "A mobile-focused game project built with Haxe and Heaps.io, featuring TypeScript integration",
+  "scripts": {
+    "build:ts": "tsc",
+    "vite:dev": "vite",
+    "vite:build": "vite build",
+    "vite:preview": "vite preview"
+  },
+  "keywords": [
+    "haxe",
+    "heaps",
+    "game",
+    "mobile",
+    "typescript"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@vitejs/plugin-legacy": "^7.2.1",
+    "http-server": "^14.0.0",
+    "typescript": "^5.0.0",
+    "vite": "^7.1.9"
+  },
+  "dependencies": {
+    "@telegram-apps/sdk": "^3.11.8"
+  }
+}

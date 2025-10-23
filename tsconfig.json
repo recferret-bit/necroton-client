@@ -1,0 +1,33 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "ESNext",
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "declaration": false,
+    "sourceMap": true,
+    "removeComments": false,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["ts/*"]
+    }
+  },
+  "include": [
+    "ts/**/*",
+    "index.html"
+  ],
+  "exclude": [
+    "node_modules",
+    "bin",
+    "src",
+    "dist"
+  ]
+}

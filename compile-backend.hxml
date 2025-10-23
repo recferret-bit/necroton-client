@@ -1,0 +1,13 @@
+# Backend compilation for Necroton Engine
+# Generates engine module for Nest.js backend
+
+-cp src
+
+-js dist/engine.js
+-main engine.NecrotonEngine
+
+# Generate source map for debugging
+-D js-source-map
+
+# Optimize for production
+-D analyzer-optimize

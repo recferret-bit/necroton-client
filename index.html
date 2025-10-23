@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, shrink-to-fit=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#202020">
+    
+    <title>NecroTon</title>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: #202020;
+            font-family: 'Arial', sans-serif;
+            overflow: hidden;
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            touch-action: manipulation;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+        
+        #webgl {
+            background: #202020;
+            display: block;
+            max-width: 100%;
+            max-height: 100%;
+            width: 100%;
+            height: 100%;
+            image-rendering: pixelated;
+            image-rendering: -moz-crisp-edges;
+            image-rendering: crisp-edges;
+        }
+        
+        /* Mobile landscape orientation handling */
+        @media screen and (orientation: landscape) {
+            body {
+                /* Specific styles for landscape */
+            }
+        }
+        
+        /* High DPI display support */
+        @media (-webkit-min-device-pixel-ratio: 2) {
+            #webgl {
+                image-rendering: -webkit-optimize-contrast;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- TypeScript compiled JavaScript will be loaded here -->
+    <!-- <script src="customScripts.js"></script> -->
+    
+    <canvas id="webgl"></canvas>
+    <script type="text/javascript" src="game.js?b=5"></script>
+    <script type="module" src="/ts/main.ts"></script>
+    
+    <script>
+        // Mobile-specific initialization
+        window.addEventListener('DOMContentLoaded', function() {
+            // Prevent zoom on double tap
+            let lastTouchEnd = 0;
+            document.addEventListener('touchend', function (event) {
+                const now = (new Date()).getTime();
+                if (now - lastTouchEnd <= 300) {
+                    event.preventDefault();
+                }
+                lastTouchEnd = now;
+            }, false);
+            
+            // Prevent scrolling and bouncing
+            document.body.addEventListener('touchmove', function(e) {
+                e.preventDefault();
+            }, { passive: false });
+            
+            // Screen wake lock (if supported)
+            if ('wakeLock' in navigator) {
+                let wakeLock = null;
+                
+                const requestWakeLock = async () => {
+                    try {
+                        wakeLock = await navigator.wakeLock.request('screen');
+                    } catch (err) {
+                        console.log('Wake Lock not supported:', err.message);
+                    }
+                };
+                
+                requestWakeLock();
+                
+                document.addEventListener('visibilitychange', () => {
+                    if (wakeLock !== null && document.visibilityState === 'visible') {
+                        requestWakeLock();
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

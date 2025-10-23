@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Necroton Engine Test</title>
+</head>
+<body>
+    <h1>Necroton Engine Test</h1>
+    <div id="output"></div>
+    
+    <script src="dist/engine.js"></script>
+    <script>
+        // Test the engine
+        try {
+            // Create engine configuration
+            var config = {
+                mode: engine_EngineMode.SINGLEPLAYER,
+                tickRate: 60,
+                entitySizePixels: 32,
+                aiUpdateInterval: 10,
+                snapshotBufferSize: 1000,
+                spatialHashCellSize: 64,
+                rngSeed: 12345,
+                snapshotEmissionInterval: 5
+            };
+            
+            // Create engine instance
+            var engine = engine_NecrotonEngine.create(config);
+            
+            // Subscribe to events
+            var token = engine.subscribeEvent("entity:spawn", function(event) {
+                console.log("Entity spawned:", event);
+                document.getElementById('output').innerHTML += "<p>Entity spawned: " + event.entityId + "</p>";
+            });
+            
+            // Start engine
+            engine.start();
+            
+            // Spawn a character
+            var entityId = engine.spawnEntity("character", {
+                pos: {x: 100, y: 200},
+                ownerId: "player1",
+                params: {level: 1, maxHp: 100}
+            });
+            
+            // Queue some input
+            engine.queueInput({
+                clientId: "player1",
+                sequence: 1,
+                clientTick: 1,
+                intendedServerTick: 1,
+                movement: {x: 1, y: 0},
+                actions: []
+            });
+            
+            // Step the engine a few times
+            for (var i = 0; i < 5; i++) {
+                engine.stepFixed();
+            }
+            
+            // Get snapshot
+            var snapshot = engine.getSnapshot();
+            console.log("Snapshot:", snapshot);
+            
+            document.getElementById('output').innerHTML += "<p>Engine test completed successfully!</p>";
+            
+        } catch (error) {
+            console.error("Engine test failed:", error);
+            document.getElementById('output').innerHTML += "<p>Engine test failed: " + error.message + "</p>";
+        }
+    </script>
+</body>
+</html>
