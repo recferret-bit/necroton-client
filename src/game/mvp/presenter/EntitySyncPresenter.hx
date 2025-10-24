@@ -1,18 +1,18 @@
 package game.mvp.presenter;
 
-import engine.model.entities.base.BaseEngineEntity;
 import engine.NecrotonEngine;
-import engine.model.EntityType;
-import engine.view.IEventBus;
+import engine.model.entities.EntityType;
+import engine.model.entities.base.BaseEngineEntity;
+import engine.presenter.InputMessage;
 import engine.view.EventBusConstants;
 import engine.view.EventBusTypes;
-import engine.presenter.InputMessage;
+import engine.view.IEventBus;
 import game.mvp.model.GameClientState;
 import game.mvp.model.entities.BaseEntityModel;
 import game.mvp.model.entities.CharacterModel;
+import game.mvp.model.entities.ColliderModel;
 import game.mvp.model.entities.ConsumableModel;
 import game.mvp.model.entities.EffectModel;
-import game.mvp.model.entities.ColliderModel;
 
 /**
  * Entity synchronization presenter

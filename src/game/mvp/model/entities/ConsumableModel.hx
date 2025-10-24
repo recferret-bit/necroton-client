@@ -1,7 +1,7 @@
 package game.mvp.model.entities;
 
+import engine.model.entities.EntityType;
 import engine.model.entities.impl.EngineConsumableEntity;
-import engine.model.EntityType;
 
 /**
  * Consumable entity model extending BaseEntityModel

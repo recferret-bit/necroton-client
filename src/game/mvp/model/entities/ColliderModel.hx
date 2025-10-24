@@ -1,7 +1,7 @@
 package game.mvp.model.entities;
 
-import engine.model.entities.impl.EngineColliderEntity;
 import engine.model.entities.base.BaseEngineEntity;
+import engine.model.entities.impl.EngineColliderEntity;
 
 /**
  * Collider entity model extending BaseEntityModel

@@ -1,12 +1,12 @@
 package game.mvp.view.entities;
 
+import engine.model.entities.EntityType;
+import game.mvp.model.entities.BaseEntityModel;
 import game.mvp.presenter.GamePresenter;
-import h2d.Object;
-import h2d.Tile;
 import h2d.Bitmap;
 import h2d.Graphics;
-import game.mvp.model.entities.BaseEntityModel;
-import engine.model.EntityType;
+import h2d.Object;
+import h2d.Tile;
 
 /**
  * Base game entity view using Tile.fromColor approach

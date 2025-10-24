@@ -5,9 +5,9 @@ import engine.model.entities.EngineEntitySpecs;
 import engine.model.entities.base.EngineEntitySpec;
 import game.config.GameClientConfig;
 import game.mvp.model.GameClientState;
-import game.mvp.view.GameViewOrchestrator;
-import game.mvp.presenter.InputPresenter;
 import game.mvp.presenter.EntitySyncPresenter;
+import game.mvp.presenter.InputPresenter;
+import game.mvp.view.GameViewOrchestrator;
 
 /**
  * Main game presenter coordinating MVP components
@@ -53,8 +53,8 @@ class GamePresenter {
         // Create game client state
         gameClientState = new GameClientState();
         
-        // Create view orchestrator
-        viewOrchestrator = new GameViewOrchestrator(gameClientState, parent);
+        // Create view orchestrator with scene reference
+        viewOrchestrator = new GameViewOrchestrator(gameClientState, parent, cast(parent, h2d.Scene));
         
         // Create engine with config
         engine = NecrotonEngine.create(Config.engineConfig);
@@ -170,6 +170,12 @@ class GamePresenter {
             inputModule.setClientEntity("player1", playerId);
         }
         
+        // Set up camera to follow player
+        var cameraController = viewOrchestrator.getCameraController();
+        if (cameraController != null) {
+            cameraController.followEntity(playerId);
+        }
+        
         // Spawn AI acolytes
         // var acolytePositions = EntitySpecs.getSpawnPositions().acolytes;
         // for (i in 0...acolytePositions.length) {
@@ -257,6 +263,20 @@ class GamePresenter {
      */
     public function getEntitySyncPresenter(): EntitySyncPresenter {
         return entitySyncPresenter;
+    }
+    
+    /**
+     * Get camera controller
+     */
+    public function getCameraController(): game.mvp.view.camera.CameraController {
+        return viewOrchestrator.getCameraController();
+    }
+    
+    /**
+     * Update camera centering for screen size changes
+     */
+    public function updateCameraCentering(): Void {
+        viewOrchestrator.updateCameraCentering();
     }
     
     /**

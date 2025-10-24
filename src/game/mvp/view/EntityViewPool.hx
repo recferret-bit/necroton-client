@@ -1,11 +1,11 @@
 package game.mvp.view;
 
-import h2d.Object;
-import engine.model.EntityType;
+import engine.model.entities.EntityType;
 import game.mvp.view.entities.BaseGameEntityView;
 import game.mvp.view.entities.CharacterEntityView;
 import game.mvp.view.entities.ConsumableEntityView;
 import game.mvp.view.entities.EffectEntityView;
+import h2d.Object;
 
 /**
  * Object pool for view entities

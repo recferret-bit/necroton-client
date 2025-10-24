@@ -1,10 +1,9 @@
 package game.mvp.view.entities;
 
-import h2d.Object;
-import h2d.Graphics;
-import game.mvp.model.entities.ColliderModel;
 import game.mvp.model.entities.BaseEntityModel;
+import game.mvp.model.entities.ColliderModel;
 import game.mvp.presenter.GamePresenter;
+import h2d.Object;
 
 /**
  * Collider entity view extending BaseGameEntityView

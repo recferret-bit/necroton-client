@@ -1,18 +1,18 @@
 package game.mvp.view;
 
-import h2d.Object;
-import h2d.Graphics;
-import engine.model.EntityType;
+import engine.model.entities.EntityType;
 import game.mvp.model.GameClientState;
 import game.mvp.model.entities.BaseEntityModel;
-import game.mvp.model.entities.CharacterModel;
-import game.mvp.model.entities.ConsumableModel;
-import game.mvp.model.entities.EffectModel;
 import game.mvp.view.entities.BaseGameEntityView;
 import game.mvp.view.entities.CharacterEntityView;
+import game.mvp.view.entities.ColliderEntityView;
 import game.mvp.view.entities.ConsumableEntityView;
 import game.mvp.view.entities.EffectEntityView;
-import game.mvp.view.entities.ColliderEntityView;
+import game.mvp.view.camera.CameraController;
+import game.mvp.view.camera.CameraConfig;
+import h2d.Graphics;
+import h2d.Object;
+import h2d.Scene;
 
 /**
  * Game view orchestrator
@@ -24,6 +24,10 @@ class GameViewOrchestrator {
     private var gameClientState: GameClientState;
     private var entityViewPool: EntityViewPool;
     private var parent: Object;
+    private var scene: Scene;
+    
+    // Camera controller
+    private var cameraController: CameraController;
     
     // View management
     private var entityViews: Map<Int, BaseGameEntityView>;
@@ -37,9 +41,10 @@ class GameViewOrchestrator {
     private var enableObjectPooling: Bool;
     private var enableInterpolation: Bool;
     
-    public function new(gameClientState: GameClientState, parent: Object) {
+    public function new(gameClientState: GameClientState, parent: Object, scene: Scene) {
         this.gameClientState = gameClientState;
         this.parent = parent;
+        this.scene = scene;
         
         // Initialize components
         entityViewPool = new EntityViewPool();
@@ -56,6 +61,9 @@ class GameViewOrchestrator {
         
         // Create debug graphics
         createDebugGraphics();
+        
+        // Initialize camera controller
+        initializeCameraController();
     }
     
     /**
@@ -87,6 +95,21 @@ class GameViewOrchestrator {
     }
     
     /**
+     * Initialize camera controller
+     */
+    private function initializeCameraController(): Void {
+        var cameraConfig = CameraConfig.createLerpConfig(0.15); // Default smooth following
+        
+        // Center the character in the camera view
+        // Offset camera by half screen size so character appears centered
+        var screenWidth = scene.width;
+        var screenHeight = scene.height;
+        cameraConfig.setViewportOffset(-screenWidth * 0.5, -screenHeight * 0.5);
+        
+        cameraController = new CameraController(scene, gameClientState, cameraConfig);
+    }
+    
+    /**
      * Update all views
      */
     public function update(dt: Float): Void {
@@ -95,6 +118,11 @@ class GameViewOrchestrator {
             if (view.isViewInitialized()) {
                 view.update();
             }
+        }
+        
+        // Update camera controller
+        if (cameraController != null) {
+            cameraController.update(dt);
         }
         
         // Update debug graphics
@@ -384,6 +412,24 @@ class GameViewOrchestrator {
     }
     
     /**
+     * Get camera controller
+     */
+    public function getCameraController(): CameraController {
+        return cameraController;
+    }
+    
+    /**
+     * Update camera centering for screen size changes
+     */
+    public function updateCameraCentering(): Void {
+        if (cameraController != null) {
+            var screenWidth = scene.width;
+            var screenHeight = scene.height;
+            cameraController.setViewportOffset(-screenWidth * 0.5, -screenHeight * 0.5);
+        }
+    }
+    
+    /**
      * Get orchestrator summary for debugging
      */
     public function getOrchestratorSummary(): Dynamic {
@@ -394,7 +440,8 @@ class GameViewOrchestrator {
             effectViews: getViewCountByType(EFFECT),
             poolSummary: entityViewPool.getPoolSummary(),
             objectPoolingEnabled: enableObjectPooling,
-            interpolationEnabled: enableInterpolation
+            interpolationEnabled: enableInterpolation,
+            cameraState: cameraController != null ? cameraController.getCameraState() : null
         };
     }
 }

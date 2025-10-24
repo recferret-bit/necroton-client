@@ -1,11 +1,9 @@
 package game.mvp.view.entities;
 
-import h2d.Object;
-import h2d.Tile;
-import h2d.Bitmap;
-import h2d.Graphics;
-import game.mvp.model.entities.CharacterModel;
 import game.mvp.model.entities.BaseEntityModel;
+import game.mvp.model.entities.CharacterModel;
+import h2d.Graphics;
+import h2d.Object;
 
 /**
  * Character entity view extending BaseGameEntityView

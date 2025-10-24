@@ -1,6 +1,6 @@
 package game.mvp.model;
 
-import engine.model.EntityType;
+import engine.model.entities.EntityType;
 import engine.presenter.InputMessage;
 import game.mvp.model.entities.BaseEntityModel;
 import game.mvp.model.entities.CharacterModel;
