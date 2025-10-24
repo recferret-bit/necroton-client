@@ -1,4 +1,4 @@
-package engine.model;
+package engine.model.entities;
 
 /**
  * Entity type definitions as abstract string enum

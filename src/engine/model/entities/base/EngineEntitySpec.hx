@@ -1,6 +1,6 @@
 package engine.model.entities.base;
 
-import engine.model.EntityType;
+import engine.model.entities.EntityType;
 
 /**
  * Entity specification type definitions for type-safe entity creation

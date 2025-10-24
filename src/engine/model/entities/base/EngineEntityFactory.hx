@@ -1,7 +1,7 @@
 package engine.model.entities.base;
 
-import engine.model.EntityType;
 import engine.model.ObjectPool;
+import engine.model.entities.EntityType;
 import engine.model.entities.base.BaseEngineEntity;
 import engine.model.entities.base.EngineEntitySpec;
 import engine.model.entities.impl.EngineCharacterEntity;

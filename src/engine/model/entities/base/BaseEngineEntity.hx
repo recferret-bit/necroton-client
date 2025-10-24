@@ -2,7 +2,7 @@ package engine.model.entities.base;
 
 import engine.geometry.Vec2;
 import engine.geometry.Vec2Utils;
-import engine.model.EntityType;
+import engine.model.entities.EntityType;
 import engine.model.entities.base.AbstractEngineEntity;
 import engine.model.entities.base.EngineEntitySpec;
 

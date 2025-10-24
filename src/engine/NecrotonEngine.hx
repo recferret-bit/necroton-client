@@ -1,8 +1,8 @@
 package engine;
 
 import engine.EngineConfig;
-import engine.model.EntityType;
 import engine.model.GameModelState;
+import engine.model.entities.EntityType;
 import engine.model.entities.base.BaseEngineEntity;
 import engine.model.entities.base.EngineEntitySpec;
 import engine.model.entities.impl.EngineCharacterEntity;
@@ -62,6 +62,7 @@ import engine.view.IEventBus;
  * });
  * ```
  */
+@:expose()
 class NecrotonEngine {
     public static var Config: EngineConfig;
     

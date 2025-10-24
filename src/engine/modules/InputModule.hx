@@ -1,7 +1,7 @@
 package engine.modules;
 
 import engine.EngineConfig;
-import engine.model.EntityType;
+import engine.model.entities.EntityType;
 import engine.model.GameModelState;
 import engine.model.entities.impl.EngineCharacterEntity;
 import engine.model.managers.IEngineEntityManager;

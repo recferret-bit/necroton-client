@@ -1,0 +1,29 @@
+{
+  "name": "necroton-backend-integration",
+  "version": "1.0.0",
+  "description": "Node.js backend integration for NecrotonEngine with TypeScript bindings",
+  "main": "dist/server.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "dev": "tsc && node dist/server.js",
+    "watch": "tsc --watch"
+  },
+  "keywords": [
+    "necroton",
+    "game-engine",
+    "backend",
+    "typescript",
+    "nodejs"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {
+    "typescript": "^5.0.0",
+    "@types/node": "^20.0.0"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}

@@ -1,6 +1,6 @@
 package engine.model.entities.impl;
 
-import engine.model.EntityType;
+import engine.model.entities.EntityType;
 import engine.model.entities.base.BaseEngineEntity;
 import engine.model.entities.base.EngineEntitySpec;
 

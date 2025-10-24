@@ -1,8 +1,8 @@
 package engine.model;
 
 import engine.model.DeterministicRng;
-import engine.model.EntityType;
 import engine.model.ObjectPool;
+import engine.model.entities.EntityType;
 import engine.model.entities.base.EngineEntityFactory;
 import engine.model.entities.impl.EngineCharacterEntity;
 import engine.model.entities.impl.EngineColliderEntity;

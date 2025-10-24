@@ -1,7 +1,7 @@
 package engine.model;
 
-import engine.model.EntityType;
 import engine.model.entities.base.BaseEngineEntity;
+import engine.model.entities.EntityType;
 
 /**
  * Generic object pool for entity reuse

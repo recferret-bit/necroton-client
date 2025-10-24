@@ -3,7 +3,7 @@ package engine.modules;
 import engine.geometry.Rect;
 import engine.geometry.RectUtils;
 import engine.geometry.Vec2Utils;
-import engine.model.EntityType;
+import engine.model.entities.EntityType;
 import engine.model.GameModelState;
 import engine.model.entities.base.BaseEngineEntity;
 import engine.model.entities.impl.EngineColliderEntity;
