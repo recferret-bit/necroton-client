@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite'
-import { copyFileSync, readFileSync, writeFileSync } from 'fs'
+import { copyFileSync, readFileSync, writeFileSync, unlinkSync } from 'fs'
+import { execSync } from 'child_process'
 
 export default defineConfig(({ command, mode }) => {
   const isProduction = mode === 'production'
@@ -89,9 +90,6 @@ export default defineConfig(({ command, mode }) => {
               // If this is a production build, minify the game.js content
               if (isProduction) {
                 try {
-                  const { execSync } = require('child_process')
-                  const { writeFileSync, readFileSync, unlinkSync } = require('fs')
-                  
                   // Write game.js content to a temp file
                   const tempFile = 'temp_game.js'
                   writeFileSync(tempFile, gameJsContent)
@@ -128,7 +126,6 @@ export default defineConfig(({ command, mode }) => {
             // If requesting main.js, compile TypeScript on the fly
             if (req.url === '/main.js') {
               try {
-                const { execSync } = require('child_process')
                 execSync('tsc --project tsconfig.build.json', { stdio: 'inherit' })
                 console.log('✓ Compiled TypeScript for development')
               } catch (err) {
@@ -173,8 +170,6 @@ export default defineConfig(({ command, mode }) => {
         closeBundle() {
           if (isProduction) {
             try {
-              const { unlinkSync } = require('fs')
-              
               // List of files to remove after bundling
               const filesToRemove = [
                 'dist/bundle.js',
