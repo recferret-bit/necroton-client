@@ -12,9 +12,15 @@ export default defineConfig(({ command, mode }) => {
     build: {
       // Output directory
       outDir: 'dist',
-      // Keep the same structure as your current setup
+      // Configure output for production builds
       rollupOptions: {
-        input: './index.html'
+        input: './index.html',
+        output: isProduction ? {
+          // For production, generate bundle.min.js in dist root
+          entryFileNames: 'bundle.min.js',
+          chunkFileNames: 'assets/[name]-[hash].js',
+          assetFileNames: 'assets/[name]-[hash].[ext]'
+        } : undefined
       },
       // Minify for production, don't minify for dev
       minify: isProduction,
@@ -101,31 +107,24 @@ export default defineConfig(({ command, mode }) => {
         writeBundle(options, bundle) {
           if (isProduction) {
             try {
-              // Find the main bundled asset file
-              const mainAssetFile = Object.keys(bundle).find(key => 
-                bundle[key].type === 'chunk' && bundle[key].isEntry
+              // Read the original index.html
+              let indexContent = readFileSync('index.html', 'utf8')
+              
+              // Replace the TypeScript module script with bundle.min.js for production
+              indexContent = indexContent.replace(
+                '<script type="module" src="/dist/main.js"></script>',
+                '<script type="text/javascript" src="./bundle.min.js"></script>'
               )
               
-              if (mainAssetFile) {
-                // Read the original index.html
-                let indexContent = readFileSync('index.html', 'utf8')
-                
-                // Replace the TypeScript module script with the bundled asset for production
-                indexContent = indexContent.replace(
-                  '<script type="module" src="/dist/main.js"></script>',
-                  `<script type="text/javascript" src="./${mainAssetFile}"></script>`
-                )
-                
-                // Remove the separate game.js script tag since it's now bundled
-                indexContent = indexContent.replace(
-                  '<script type="text/javascript" src="./game.js"></script>',
-                  ''
-                )
-                
-                // Write it as index.html in the dist folder
-                writeFileSync('dist/index.html', indexContent)
-                console.log(`✓ Generated production index.html with bundled asset: ${mainAssetFile}`)
-              }
+              // Remove the separate game.js script tag since it's now bundled
+              indexContent = indexContent.replace(
+                '<script type="text/javascript" src="./game.js"></script>',
+                ''
+              )
+              
+              // Write it as index.html in the dist folder
+              writeFileSync('dist/index.html', indexContent)
+              console.log('✓ Generated production index.html with bundle.min.js')
             } catch (err) {
               console.warn('Could not generate production index.html:', err.message)
             }
@@ -142,7 +141,6 @@ export default defineConfig(({ command, mode }) => {
               // List of files to remove after bundling
               const filesToRemove = [
                 'dist/bundle.js',
-                'dist/bundle.min.js', 
                 'dist/main.js',
                 'dist/main.js.map',
                 'dist/mobileUtils.js',
