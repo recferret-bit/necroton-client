@@ -1,5 +1,3 @@
-import { TouchData, GameConfig } from './types';
-
 class MobileUtils {
     public test() {
         console.log('test from TS!');

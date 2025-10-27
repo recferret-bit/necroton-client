@@ -21,17 +21,17 @@ import h2d.Scene;
  */
 class GameViewOrchestrator {
     // Core components
-    private var gameClientState: GameClientState;
-    private var entityViewPool: EntityViewPool;
-    private var parent: Object;
-    private var scene: Scene;
+    private final gameClientState: GameClientState;
+    private final entityViewPool: EntityViewPool;
+    private final parent: Object;
+    private final scene: Scene;
     
     // Camera controller
     private var cameraController: CameraController;
     
     // View management
-    private var entityViews: Map<Int, BaseGameEntityView>;
-    private var viewLayers: Map<EntityType, Object>;
+    private final entityViews: Map<Int, BaseGameEntityView>;
+    private final viewLayers: Map<EntityType, Object>;
     
     // Debug graphics
     private var debugGraphics: Graphics;
@@ -60,7 +60,7 @@ class GameViewOrchestrator {
         createViewLayers();
         
         // Create debug graphics
-        createDebugGraphics();
+        debugGraphics = new Graphics(parent);
         
         // Initialize camera controller
         initializeCameraController();
@@ -88,22 +88,15 @@ class GameViewOrchestrator {
     }
     
     /**
-     * Create debug graphics
-     */
-    private function createDebugGraphics(): Void {
-        debugGraphics = new Graphics(parent);
-    }
-    
-    /**
      * Initialize camera controller
      */
     private function initializeCameraController(): Void {
-        var cameraConfig = CameraConfig.createLerpConfig(0.15); // Default smooth following
+        final cameraConfig = CameraConfig.createLerpConfig(0.15); // Default smooth following
         
         // Center the character in the camera view
         // Offset camera by half screen size so character appears centered
-        var screenWidth = scene.width;
-        var screenHeight = scene.height;
+        final screenWidth = scene.width;
+        final screenHeight = scene.height;
         cameraConfig.setViewportOffset(-screenWidth * 0.5, -screenHeight * 0.5);
         
         cameraController = new CameraController(scene, gameClientState, cameraConfig);
@@ -136,14 +129,14 @@ class GameViewOrchestrator {
      */
     public function syncWithModels(): Void {
         // Get all models from game state
-        var allModels = gameClientState.getAliveEntities();
+        final allModels = gameClientState.getAliveEntities();
         
         // Track which models have views
-        var modelsWithViews = new Map<Int, Bool>();
+        final modelsWithViews = new Map<Int, Bool>();
         
         // Update existing views
         for (model in allModels) {
-            var view = entityViews.get(model.id);
+            final view = entityViews.get(model.id);
             if (view != null) {
                 // Update existing view
                 view.update();
@@ -156,7 +149,7 @@ class GameViewOrchestrator {
         }
         
         // Remove views for models that no longer exist
-        var viewsToRemove = [];
+        final viewsToRemove = [];
         for (entityId in entityViews.keys()) {
             if (!modelsWithViews.exists(entityId)) {
                 viewsToRemove.push(entityId);
@@ -223,7 +216,7 @@ class GameViewOrchestrator {
      * Remove view by entity ID
      */
     private function removeView(entityId: Int): Void {
-        var view = entityViews.get(entityId);
+        final view = entityViews.get(entityId);
         if (view != null) {
             // Remove from map
             entityViews.remove(entityId);
@@ -248,7 +241,7 @@ class GameViewOrchestrator {
      * Get all views of specific type
      */
     public function getViewsByType(type: EntityType): Array<BaseGameEntityView> {
-        var result = [];
+        final result = [];
         for (view in entityViews) {
             if (view.getModel() != null && view.getModel().type == type) {
                 result.push(view);
@@ -261,7 +254,7 @@ class GameViewOrchestrator {
      * Get character views
      */
     public function getCharacterViews(): Array<CharacterEntityView> {
-        var result = [];
+        final result = [];
         for (view in entityViews) {
             if (Std.isOfType(view, CharacterEntityView)) {
                 result.push(cast view);
@@ -274,7 +267,7 @@ class GameViewOrchestrator {
      * Get consumable views
      */
     public function getConsumableViews(): Array<ConsumableEntityView> {
-        var result = [];
+        final result = [];
         for (view in entityViews) {
             if (Std.isOfType(view, ConsumableEntityView)) {
                 result.push(cast view);
@@ -287,7 +280,7 @@ class GameViewOrchestrator {
      * Get effect views
      */
     public function getEffectViews(): Array<EffectEntityView> {
-        var result = [];
+        final result = [];
         for (view in entityViews) {
             if (Std.isOfType(view, EffectEntityView)) {
                 result.push(cast view);
@@ -304,14 +297,14 @@ class GameViewOrchestrator {
         
         // Draw entity count info
         var y = 10;
-        var lineHeight = 15;
+        final lineHeight = 15;
         
         debugGraphics.beginFill(0x000000, 0.7);
         debugGraphics.drawRect(10, 10, 200, 100);
         debugGraphics.endFill();
         
         // Draw pool statistics
-        var poolSummary = entityViewPool.getPoolSummary();
+        final poolSummary = entityViewPool.getPoolSummary();
         debugGraphics.setColor(0xFFFFFF);
         // Note: Graphics doesn't have drawText, we'll use simple shapes for debug info
         // This is a simplified debug display
@@ -423,8 +416,8 @@ class GameViewOrchestrator {
      */
     public function updateCameraCentering(): Void {
         if (cameraController != null) {
-            var screenWidth = scene.width;
-            var screenHeight = scene.height;
+            final screenWidth = scene.width;
+            final screenHeight = scene.height;
             cameraController.setViewportOffset(-screenWidth * 0.5, -screenHeight * 0.5);
         }
     }
