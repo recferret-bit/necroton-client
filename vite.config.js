@@ -23,7 +23,18 @@ export default defineConfig(({ command, mode }) => {
         } : undefined
       },
       // Minify for production, don't minify for dev
-      minify: isProduction,
+      minify: isProduction ? 'terser' : false,
+      terserOptions: isProduction ? {
+        compress: {
+          drop_console: true,
+          drop_debugger: true,
+          pure_funcs: ['console.log']
+        },
+        mangle: true,
+        format: {
+          comments: false
+        }
+      } : undefined,
       // Source maps for debugging
       sourcemap: !isProduction,
       // Don't clean the dist directory for production builds
@@ -67,7 +78,7 @@ export default defineConfig(({ command, mode }) => {
         generateBundle(options, bundle) {
           try {
             // Read game.js content
-            const gameJsContent = readFileSync('game.js', 'utf8')
+            let gameJsContent = readFileSync('game.js', 'utf8')
             
             // Find the main bundle file
             const mainBundleFile = Object.keys(bundle).find(key => 
@@ -75,6 +86,32 @@ export default defineConfig(({ command, mode }) => {
             )
             
             if (mainBundleFile) {
+              // If this is a production build, minify the game.js content
+              if (isProduction) {
+                try {
+                  const { execSync } = require('child_process')
+                  const { writeFileSync, readFileSync, unlinkSync } = require('fs')
+                  
+                  // Write game.js content to a temp file
+                  const tempFile = 'temp_game.js'
+                  writeFileSync(tempFile, gameJsContent)
+                  
+                  // Use terser to minify it
+                  execSync(`npx terser ${tempFile} --output ${tempFile}.min --compress --mangle --comments false`, { stdio: 'pipe' })
+                  
+                  // Read the minified content
+                  gameJsContent = readFileSync(`${tempFile}.min`, 'utf8')
+                  
+                  // Clean up temp files
+                  unlinkSync(tempFile)
+                  unlinkSync(`${tempFile}.min`)
+                  
+                  console.log('✓ Minified game.js content')
+                } catch (minifyErr) {
+                  console.warn('Could not minify game.js:', minifyErr.message)
+                }
+              }
+              
               // Prepend game.js content to the main bundle
               bundle[mainBundleFile].code = gameJsContent + '\n' + bundle[mainBundleFile].code
               console.log('✓ Bundled game.js into main bundle')
