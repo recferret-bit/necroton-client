@@ -113,7 +113,7 @@ export default defineConfig(({ command, mode }) => {
                 // Replace the TypeScript module script with the bundled asset for production
                 indexContent = indexContent.replace(
                   '<script type="module" src="/dist/main.js"></script>',
-                  `<script type="module" src="./${mainAssetFile}"></script>`
+                  `<script type="text/javascript" src="./${mainAssetFile}"></script>`
                 )
                 
                 // Remove the separate game.js script tag since it's now bundled
