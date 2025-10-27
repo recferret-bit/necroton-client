@@ -54,16 +54,27 @@ export default defineConfig(({ command, mode }) => {
       devSourcemap: !isProduction
     },
     
-    // Plugin to copy game.js and generate production index.html
+    // Plugin to bundle game.js and generate production index.html
     plugins: [
       {
-        name: 'copy-game-js',
-        closeBundle() {
+        name: 'bundle-game-js',
+        generateBundle(options, bundle) {
           try {
-            copyFileSync('game.js', 'dist/game.js')
-            console.log('✓ Copied game.js to dist/')
+            // Read game.js content
+            const gameJsContent = readFileSync('game.js', 'utf8')
+            
+            // Find the main bundle file
+            const mainBundleFile = Object.keys(bundle).find(key => 
+              bundle[key].type === 'chunk' && bundle[key].isEntry
+            )
+            
+            if (mainBundleFile) {
+              // Prepend game.js content to the main bundle
+              bundle[mainBundleFile].code = gameJsContent + '\n' + bundle[mainBundleFile].code
+              console.log('✓ Bundled game.js into main bundle')
+            }
           } catch (err) {
-            console.warn('Could not copy game.js:', err.message)
+            console.warn('Could not bundle game.js:', err.message)
           }
         }
       },
@@ -87,23 +98,67 @@ export default defineConfig(({ command, mode }) => {
       },
       {
         name: 'generate-prod-index',
+        writeBundle(options, bundle) {
+          if (isProduction) {
+            try {
+              // Find the main bundled asset file
+              const mainAssetFile = Object.keys(bundle).find(key => 
+                bundle[key].type === 'chunk' && bundle[key].isEntry
+              )
+              
+              if (mainAssetFile) {
+                // Read the original index.html
+                let indexContent = readFileSync('index.html', 'utf8')
+                
+                // Replace the TypeScript module script with the bundled asset for production
+                indexContent = indexContent.replace(
+                  '<script type="module" src="/dist/main.js"></script>',
+                  `<script type="module" src="./${mainAssetFile}"></script>`
+                )
+                
+                // Remove the separate game.js script tag since it's now bundled
+                indexContent = indexContent.replace(
+                  '<script type="text/javascript" src="./game.js"></script>',
+                  ''
+                )
+                
+                // Write it as index.html in the dist folder
+                writeFileSync('dist/index.html', indexContent)
+                console.log(`✓ Generated production index.html with bundled asset: ${mainAssetFile}`)
+              }
+            } catch (err) {
+              console.warn('Could not generate production index.html:', err.message)
+            }
+          }
+        }
+      },
+      {
+        name: 'cleanup-unnecessary-files',
         closeBundle() {
           if (isProduction) {
             try {
-              // Read the original index.html
-              let indexContent = readFileSync('index.html', 'utf8')
+              const { unlinkSync } = require('fs')
               
-              // Replace the TypeScript module script with bundle.min.js for production
-              indexContent = indexContent.replace(
-                '<script type="module" src="/dist/main.js"></script>',
-                '<script type="module" src="./bundle.min.js"></script>'
-              )
+              // List of files to remove after bundling
+              const filesToRemove = [
+                'dist/bundle.js',
+                'dist/bundle.min.js', 
+                'dist/main.js',
+                'dist/main.js.map',
+                'dist/mobileUtils.js',
+                'dist/mobileUtils.js.map'
+              ]
               
-              // Write it as index.html in the dist folder
-              writeFileSync('dist/index.html', indexContent)
-              console.log('✓ Generated production index.html with bundle.min.js')
+              filesToRemove.forEach(file => {
+                try {
+                  unlinkSync(file)
+                  console.log(`✓ Removed unnecessary file: ${file}`)
+                } catch (err) {
+                  // File might not exist, which is fine
+                }
+              })
             } catch (err) {
-              console.warn('Could not generate production index.html:', err.message)
+              console.warn('Could not clean up unnecessary files:', err.message)
             }
           }
         }
