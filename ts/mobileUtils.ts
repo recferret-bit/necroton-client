@@ -1,6 +1,6 @@
 class MobileUtils {
     public test() {
-        console.log('test from TS!');
+        console.log('test from TS 2!');
     }
 
     public requestFullscreen(): void {
