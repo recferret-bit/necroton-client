@@ -17,7 +17,6 @@ yarn-debug.log*
 yarn-error.log*
 
 # Generated files
-game.js
 game.js.map
 
 # OS generated files
