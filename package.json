@@ -4,7 +4,7 @@
   "description": "A mobile-focused game project built with Haxe and Heaps.io, featuring TypeScript integration",
   "scripts": {
     "build:tsc": "tsc --project tsconfig.build.json && esbuild dist/main.js --bundle --outfile=dist/bundle.js --format=esm",
-    "build:tsc:prod": "tsc --project tsconfig.build.json && esbuild dist/main.js --bundle --outfile=dist/bundle.js --format=esm --minify && terser dist/bundle.js --output dist/bundle.min.js --compress --mangle",
+    "build:tsc:prod": "tsc --project tsconfig.build.json && esbuild dist/main.js --bundle --outfile=dist/bundle.js --format=esm --minify",
     "dev": "npm run build:tsc && vite",
     "vite:dev": "vite",
     "vite:build": "vite build --mode development",
