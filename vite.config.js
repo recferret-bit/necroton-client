@@ -146,15 +146,11 @@ export default defineConfig(({ command, mode }) => {
               
               // Replace the TypeScript module script with bundle.min.js for production
               indexContent = indexContent.replace(
-                '<script type="text/javascript" src="/dist/main.js"></script>',
+                '<script type="module" src="/dist/main.js"></script>',
                 '<script type="text/javascript" src="./bundle.min.js"></script>'
               )
               
-              // Remove the separate game.js script tag since it's now bundled
-              indexContent = indexContent.replace(
-                '<script type="text/javascript" src="./game.js"></script>',
-                ''
-              )
+              // game.js is now bundled, no need to remove separate script tag
               
               // Write it as index.html in the dist folder
               writeFileSync('dist/index.html', indexContent)
